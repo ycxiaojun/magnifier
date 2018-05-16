@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>放大镜特效</title>
+	<meta charset="utf-8">
+	<style type="text/css">
+		#layout{
+			width: 860px;margin: 50px auto 0;
+		}
+		#box{
+		    display: block;
+		    width: 430px;
+		    height: 430px;
+		    border: 1px solid #ccc;
+		    position: relative;
+		    padding: 1px;
+		}
+		#small-box{
+		    position: relative;
+		    z-index: 1;
+		}
+		#small-box img{
+		    top: -100px;
+		    width: 430px;
+		    height: auto;
+		}
+		#float-box {
+		    display: none;
+		    width: 160px;
+		    height: 160px;
+		    position: absolute;
+		    background-attachment: scroll;
+		    background-repeat: repeat;
+		    cursor: move;
+		    z-index: 1;
+		    overflow: hidden;
+		    background-image: url(img/float-img.png);
+		}
+		#mark {
+		    position: absolute;
+		    display: block;
+		    width: 430px;
+		    height: 430px;
+		    background-color: #fff;
+		    filter: alpha(opacity=0);
+		    opacity: 0;
+		    z-index: 10;
+		    cursor: move;
+		}
+		#big-box {
+		    display: none;
+		    position: absolute;
+		    top: 0;
+		    left: 460px;
+		    width: 430px;
+		    height: 430px;
+		    overflow: hidden;
+		    border: 1px solid #ccc;
+		    z-index: 99;
+		    background-color: #fff;
+		}
+		#big-box img {
+		    position: absolute;
+		    z-index: 5;
+		}
+	</style>
+</head>
+<body>
+	<div id="layout">
+		<div id="box">
+			<div id="small-box">
+				<div id="mark"></div>
+				<div id="float-box"></div>
+				<img src="img/img.jpg" id="small-img">
+			</div>
+			<div id="big-box">
+				<img src="img/img.jpg" id="big-img">
+			</div>
+		</div>
+	</div>
+<script type="text/javascript">
+	var box = document.getElementById("box"),
+        mark = document.getElementById("mark"),
+        floatBox = document.getElementById("float-box"),
+        bigBox = document.getElementById("big-box"),
+        bigImg = document.getElementById("big-img");   
+
+    // 鼠标进入mark区域，floatBox跟bigBox显示
+    mark.onmouseover = function () {
+        floatBox.style.display = "block"
+        bigBox.style.display = "block"
+    }
+    // 鼠标离开mark区域，floatBox跟bigBox隐藏
+    mark.onmouseout = function () {
+        floatBox.style.display = "none"
+        bigBox.style.display = "none"
+    }
+
+    // 鼠标在mark内移动
+    mark.onmousemove = function (ev) {
+
+        var _event = ev || window.event;  //兼容多个浏览器的event参数模式
+
+        var left = _event.clientX - box.offsetLeft - floatBox.offsetWidth/2;
+
+        var top = _event.clientY - box.offsetTop - floatBox.offsetHeight/2;
+
+        var floatRangeX = box.offsetWidth - floatBox.offsetWidth;
+
+        var floatRangeY = box.offsetHeight - floatBox.offsetHeight; 
+        //设置边界处理，防止移出小图片
+        if(left < 0){
+            left = 0;      
+        }else if(left > floatRangeX){
+            left = floatRangeX;
+        }
+
+        if(top < 0){
+            top = 0;      
+        }else if(top > floatRangeY){
+            top = floatRangeY;
+        } 
+
+        //赋值
+        floatBox.style.left = left + 'px';
+        floatBox.style.top = top + 'px';
+
+        //计算move块实际坐标占可移动范围的比例
+        var w = left/floatRangeX,
+        	h = top/floatRangeY;
+        //计算大图的移动的范围
+        var bigRangeLeft = bigImg.offsetWidth-bigBox.offsetWidth,
+        	bigRangeTop = bigImg.offsetHeight-bigBox.offsetHeight;
+
+        //计算大图的位置
+        var bigLeft = bigRangeLeft*w,
+        	bigTop = bigRangeTop*h;
+        //赋值
+        bigBox.scrollTop = bigTop;
+        bigBox.scrollLeft = bigLeft;
+    }
+</script>
+</body>
+</html>
